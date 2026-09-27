@@ -1,11 +1,9 @@
 pipeline {
 agent any
+tools {
+maven 'Maven_install_automatically'
+}
 stages {
-stage('Checkout') {
-steps {
-git 'https://github.com/luulet/OTP1_inclass1_assignment'
-}
-}
 stage('Build') {
 steps {
 bat 'mvn clean install' // sh for linux and ios
