@@ -3,6 +3,9 @@ agent any
 tools {
 maven 'Maven install automatically'
 }
+environment {
+PATH = "C:\\Users\\Pelikone\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;${env.PATH}"
+}
 stages {
 stage('Build') {
 steps {
