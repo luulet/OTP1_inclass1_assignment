@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="10" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.MainController">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <Label text="%language"/>
+    <ComboBox fx:id="languageBox" onAction="#onLanguage"/>
+    <Label text="%unit"/>
+    <ComboBox fx:id="unitBox"/>
+    <TextField fx:id="input" promptText="%prompt"/>
+    <Button text="%convert" onAction="#onConvert"/>
+    <Label fx:id="result"/>
+    <Label text="%history"/>
+    <ListView fx:id="history"/>
+</VBox>

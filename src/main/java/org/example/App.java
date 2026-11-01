@@ -1,52 +1,54 @@
 package org.example;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.NodeOrientation;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class App extends Application {
 
-    private final TemperatureConverter converter = new TemperatureConverter();
-    private final TempRecordDAO dao = new TempRecordDAO();
+    public static final List<String> LANGUAGES =
+            List.of("English", "Suomi", "Svenska", "日本語", "العربية");
+    private static final List<String> CODES = List.of("en", "fi", "sv", "ja", "ar");
+
+    private static Stage stage;
+    private static String language = "English";
+
+    public static String currentLanguage() {
+        return language;
+    }
+
+    public static void setLanguage(String name) {
+        language = name;
+        load();
+    }
+
+    private static void load() {
+        try {
+            Locale locale = Locale.forLanguageTag(CODES.get(LANGUAGES.indexOf(language)));
+            ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("/main.fxml"), bundle);
+            Parent root = loader.load();
+            ((MainController) loader.getController()).setBundle(bundle);
+            root.setNodeOrientation(locale.getLanguage().equals("ar")
+                    ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
+            stage.setTitle(bundle.getString("title"));
+            stage.setScene(new Scene(root, 350, 450));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
-    public void start(Stage stage) {
-        ComboBox<String> unit = new ComboBox<>();
-        unit.getItems().addAll("Fahrenheit", "Kelvin");
-        unit.setValue("Fahrenheit");
-        TextField input = new TextField();
-        input.setPromptText("Temperature");
-        Button convert = new Button("Convert to Celsius");
-        Label result = new Label();
-        ListView<String> history = new ListView<>();
-
-        convert.setOnAction(e -> {
-            try {
-                double value = Double.parseDouble(input.getText());
-                boolean fahrenheit = unit.getValue().equals("Fahrenheit");
-                double celsius = fahrenheit
-                        ? converter.fahrenheitToCelsius(value)
-                        : converter.kelvinToCelsius(value);
-                result.setText(celsius + " C");
-                dao.save(fahrenheit ? 1 : 2, value, celsius);
-                history.getItems().setAll(dao.findAll());
-            } catch (NumberFormatException ex) {
-                result.setText("Enter a number");
-            } catch (Exception ex) {
-                result.setText("Database error: " + ex.getMessage());
-            }
-        });
-
-        VBox root = new VBox(10, unit, input, convert, result, history);
-        root.setPadding(new javafx.geometry.Insets(10));
-        stage.setScene(new Scene(root, 350, 400));
-        stage.setTitle("Temperature Converter");
+    public void start(Stage primaryStage) {
+        stage = primaryStage;
+        load();
         stage.show();
     }
 

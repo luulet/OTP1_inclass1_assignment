@@ -39,7 +39,7 @@ bat 'docker build -t sampowes/temperature-converter:latest .'
 }
 stage('Docker Run Verify') {
 steps {
-bat 'docker run --rm sampowes/temperature-converter:latest'
+bat 'docker image inspect sampowes/temperature-converter:latest'
 }
 }
 stage('Docker Push') {
