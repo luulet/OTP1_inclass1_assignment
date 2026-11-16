@@ -10,7 +10,7 @@ Deliverables:
 - Jenkins pipeline (`Jenkinsfile`).
 - Docker image (`Dockerfile`) pushed to Docker Hub (`sampowes/temperature-converter`).
 
-Note: the JavaFX GUI and database part of the later stage is not implemented in this repository.
+The project also includes a JavaFX GUI localized into 5 languages with a database (see section 6).
 
 ## 2. Technologies & Tools Used
 - Java 24, Maven
@@ -52,3 +52,13 @@ docker run --rm sampowes/temperature-converter
 ```
 
 Jenkins: create a Pipeline job, choose "Pipeline script from SCM", set the Git repository URL and Script Path `Jenkinsfile`.
+
+## 6. Database Localization Approach: Translation Table
+Unit names and descriptions are read from the database in the selected language (UI labels stay in `messages_xx.properties`).
+- `unit` (id, unit_key, kind): language-neutral base table (celsius, fahrenheit, kelvin, kmh, km, hour).
+- `unit_translation` (unit_id FK, lang, name, description): one row per unit and language (en, fi, sv, ja, ar).
+- `conversion_record` (from_unit_id FK, to_unit_id FK, input_value, result, lang, created_at): saved conversions; the last 5 are shown in the GUI.
+- `UnitDAO` / `TempRecordDAO` use a JOIN with an English fallback (`COALESCE`), and the language selector changes both the ResourceBundle and the DB query language.
+
+Why: adding a language only needs new rows (no schema change), non-text data is not duplicated, and a missing translation falls back to English. It is the cleanest normalized option for this design.
+The schema and data are in `src/main/resources/init.sql` (UTF-8, H2 database).

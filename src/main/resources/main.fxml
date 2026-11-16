@@ -12,6 +12,7 @@
     <Label text="%unit"/>
     <ComboBox fx:id="unitBox"/>
     <TextField fx:id="input" promptText="%prompt"/>
+    <Label fx:id="description" wrapText="true"/>
     <Button text="%convert" onAction="#onConvert"/>
     <Label fx:id="result"/>
     <Label text="%history"/>

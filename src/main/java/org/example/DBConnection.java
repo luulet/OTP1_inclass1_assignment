@@ -1,5 +1,8 @@
 package org.example;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -15,17 +18,16 @@ public class DBConnection {
 
     public static Connection getConnection() throws SQLException {
         Connection conn = DriverManager.getConnection(url);
-        try (Statement st = conn.createStatement()) {
-            st.execute("CREATE TABLE IF NOT EXISTS temperature_unit ("
-                    + "id INT PRIMARY KEY, name VARCHAR(20) NOT NULL)");
-            st.execute("CREATE TABLE IF NOT EXISTS temp_record ("
-                    + "id INT AUTO_INCREMENT PRIMARY KEY, "
-                    + "unit_id INT NOT NULL, "
-                    + "input_value DOUBLE NOT NULL, "
-                    + "celsius DOUBLE NOT NULL, "
-                    + "FOREIGN KEY (unit_id) REFERENCES temperature_unit(id))");
-            st.execute("MERGE INTO temperature_unit KEY(id) VALUES (1, 'Fahrenheit')");
-            st.execute("MERGE INTO temperature_unit KEY(id) VALUES (2, 'Kelvin')");
+        try (Statement st = conn.createStatement();
+             InputStream in = DBConnection.class.getResourceAsStream("/init.sql")) {
+            String script = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            for (String sql : script.split(";")) {
+                if (!sql.isBlank()) {
+                    st.execute(sql);
+                }
+            }
+        } catch (IOException e) {
+            throw new SQLException(e);
         }
         return conn;
     }

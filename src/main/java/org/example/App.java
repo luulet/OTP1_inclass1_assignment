@@ -24,6 +24,10 @@ public class App extends Application {
         return language;
     }
 
+    public static String currentCode() {
+        return CODES.get(LANGUAGES.indexOf(language));
+    }
+
     public static void setLanguage(String name) {
         language = name;
         load();
